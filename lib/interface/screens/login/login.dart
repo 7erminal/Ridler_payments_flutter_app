@@ -15,16 +15,22 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
 
     final agent_actor = Provider.of<AgentActors>(context, listen: true);
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
 
     bool showError = false;
 
@@ -91,6 +97,9 @@ class _LoginState extends State<Login> {
                           return null;
                         },
                         controller: passwordController,
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                       ),
                     ),
                     if (showError == true)
@@ -122,7 +131,7 @@ class _LoginState extends State<Login> {
 
                             dynamic getAgentDetailsIfExists = await ApiHelperFunctions
                                 .validateCredentials(username: usernameController
-                                .text, password: passwordController.text);
+                                .text.trim(), password: passwordController.text.trim());
 
                             debugPrint(
                                 "data returned after credentials vaidation...");
@@ -130,7 +139,7 @@ class _LoginState extends State<Login> {
                             // debugPrint("${getAgentDetailsIfExists['AgentId']}");
 
                             if (getAgentDetailsIfExists != null &&
-                                getAgentDetailsIfExists['AgentId'] != null) {
+                                getAgentDetailsIfExists.runtimeType != String) {
                               agent_actor.updateAgent(AgentModel.fromJson(
                                   getAgentDetailsIfExists));
 

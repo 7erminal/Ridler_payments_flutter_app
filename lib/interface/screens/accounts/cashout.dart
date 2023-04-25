@@ -3,6 +3,7 @@ import 'package:payments/index.dart';
 import 'package:provider/provider.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Cashout extends StatefulWidget {
   const Cashout({Key? key}) : super(key: key);
@@ -12,18 +13,19 @@ class Cashout extends StatefulWidget {
 }
 
 class _CashoutState extends State<Cashout> {
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController cashoutCodeController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
 
     final agentActor = Provider.of<AgentActors>(context);
     final financeActor = Provider.of<FinanceActors>(context);
 
     String source = "app";
     String transactionType = "CASHOUT";
-
-    TextEditingController cashoutCodeController = TextEditingController();
-    TextEditingController amountController = TextEditingController();
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -47,7 +49,7 @@ class _CashoutState extends State<Cashout> {
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
           child: Form(
             key: _formKey,
-            child: Column(
+            child: ListView(
               children: [
                 Container(
                   height: height*0.4,
@@ -130,12 +132,22 @@ class _CashoutState extends State<Cashout> {
                         context.loaderOverlay.show();
                         financeActor.setTransactionAmount(amountController.text);
                         financeActor.updateCashoutCode(cashoutCodeController.text);
-
-                        dynamic cashoutDetails = await ApiHelperFunctions.cashoutDetails(amount: amountController.text, code: cashoutCodeController.text, recipientName: "", recipientNumber: "", source: source, transactionType: transactionType, agentId: agentActor.agentModel_.agentId!, branchId: agentActor.agentModel_.branchId!);
+                      try {
+                        dynamic cashoutDetails = await ApiHelperFunctions
+                            .cashoutDetails(amount: amountController.text,
+                            code: cashoutCodeController.text,
+                            recipientName: "",
+                            recipientNumber: "",
+                            source: source,
+                            transactionType: transactionType,
+                            agentId: agentActor.agentModel_.agentId!,
+                            branchId: agentActor.agentModel_.branchId!);
 
                         debugPrint("Cashout Details are $cashoutDetails");
                         debugPrint("${cashoutDetails.runtimeType}");
-                        if(cashoutDetails != null && cashoutDetails.runtimeType != "String") {
+                        if (cashoutDetails != null &&
+                            cashoutDetails.runtimeType != String) {
+                          debugPrint("Why is it still coming here????");
                           financeActor.updateTransaction(
                               TransactionModel.fromJson(cashoutDetails));
                           financeActor.updateRecentTransaction(transactionType);
@@ -146,8 +158,39 @@ class _CashoutState extends State<Cashout> {
                                 builder: (context) => CashoutInformation()),
                           );
                         } else {
+                          debugPrint("What is returned is a string");
                           context.loaderOverlay.hide();
+
+                          Fluttertoast.showToast(
+                              msg: "$cashoutDetails",
+                              toastLength: Toast.LENGTH_SHORT,
+                              //duration
+                              gravity: ToastGravity.BOTTOM,
+                              //location
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              //background color
+                              textColor: Colors.white,
+                              //text Color
+                              fontSize: 16.0 //font size
+                          );
                         }
+                      } catch(e){
+                        debugPrint("Found an exception");
+                        Fluttertoast.showToast(
+                            msg: "$e",
+                            toastLength: Toast.LENGTH_SHORT,
+                            //duration
+                            gravity: ToastGravity.BOTTOM,
+                            //location
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            //background color
+                            textColor: Colors.white,
+                            //text Color
+                            fontSize: 16.0 //font size
+                        );
+                      }
                       }
                     },
                     child: Text(

@@ -62,6 +62,7 @@ class _MyAppState extends State<MyApp> {
         '/send-money-recipient-information': (context) => SendMoney(),
         '/settings': (context) => Settings(),
         '/invoice': (context) => Invoice(),
+        '/transfers-report': (context) => TransfersReport(),
         '/': (context) => Login(),
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),

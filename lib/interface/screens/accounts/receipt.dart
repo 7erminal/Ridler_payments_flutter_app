@@ -23,10 +23,10 @@ class Invoice extends StatelessWidget {
         width: width,
         color: const Color(0xffEEF6FE),
         padding: EdgeInsets.symmetric(vertical: 40, horizontal: 35),
-        child: Column(
+        child: ListView(
           children: <Widget>[
             Container(
-              height: height*0.4,
+              height: height*0.3,
               child: Center(
                 child: Column(
                   children: [
@@ -106,6 +106,46 @@ class Invoice extends StatelessWidget {
             Row(
               children: <Widget>[
                 Text(
+                  "Receiver's name",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  '${financeActor.transactionModel_.receiverName}',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 15.0,),
+            Row(
+              children: <Widget>[
+                Text(
+                  "Receiver's number",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  '${financeActor.transactionModel_.receiverNumber}',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 15.0,),
+            Row(
+              children: <Widget>[
+                Text(
                   'Amount',
                   style: TextStyle(
                     fontSize: 18,
@@ -135,6 +175,26 @@ class Invoice extends StatelessWidget {
                 Spacer(),
                 Text(
                   'Le 0.00',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 15.0,),
+            Row(
+              children: <Widget>[
+                Text(
+                  'Total',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  'Le ${financeActor.transactionModel_.amount}',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400
@@ -204,7 +264,7 @@ class Invoice extends StatelessWidget {
                 ),
               ],
             ),
-            Spacer(),
+            SizedBox(height: 35.0,),
             Row(
               children: <Widget>[
                 Spacer(),

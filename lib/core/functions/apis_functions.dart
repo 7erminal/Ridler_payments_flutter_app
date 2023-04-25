@@ -116,6 +116,56 @@ class ApiHelperFunctions {
   }
 
   /*
+  * ######################################################
+  * ############## Get agent transfers #########################
+  * ######################################################
+  * */
+
+  static Future<dynamic> getAgentTransfers({
+    required String agentId,
+  }) async {
+    try {
+      // debugPrint("Path ${ApisPaths.getCustomerLeadApi(phoneNumber: phoneNumber)}");
+      debugPrint('agent ID $agentId');
+      dynamic resp = await ApisCaller.instance.getData(
+          path: ApisPaths.getAgentTransfersWithAgentID(agentId: agentId),
+          builder: (data) {
+            debugPrint("transactions data returned $data");
+            return data;
+          });
+      return resp;
+    } catch (e) {
+      debugPrint("Error is $e");
+      return null;
+    }
+  }
+
+  /*
+  * ######################################################
+  * ############## Get agent cashouts #########################
+  * ######################################################
+  * */
+
+  static Future<dynamic> getAgentCashouts({
+    required String agentId,
+  }) async {
+    try {
+      // debugPrint("Path ${ApisPaths.getCustomerLeadApi(phoneNumber: phoneNumber)}");
+      debugPrint('agent ID $agentId');
+      dynamic resp = await ApisCaller.instance.getData(
+          path: ApisPaths.getAgentCashoutsWithAgentID(agentId: agentId),
+          builder: (data) {
+            debugPrint("transactions data returned $data");
+            return data;
+          });
+      return resp;
+    } catch (e) {
+      debugPrint("Error is $e");
+      return null;
+    }
+  }
+
+  /*
   * #####################################
   * ############ Transfer funds ##############
   * #####################################

@@ -25,9 +25,11 @@ class Settings extends StatelessWidget {
                 pref.remove("username");
                 pref.remove("userid");
 
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
-                  return Login();
-                }));
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                      (route) => false,
+                );
               },
               child: ListTile(
                 leading: Icon(Icons.logout),

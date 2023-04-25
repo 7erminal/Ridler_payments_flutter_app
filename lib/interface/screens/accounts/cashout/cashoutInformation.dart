@@ -13,6 +13,10 @@ class CashoutInformation extends StatefulWidget {
 }
 
 class _CashoutInformationState extends State<CashoutInformation> {
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController recipientNameController = TextEditingController();
+  TextEditingController recipientNumberController = TextEditingController();
 
   cashout(String amount, String code, String recipientName, String recipientNumber, String source, String transactionType, String agentId, String branchId) async{
     dynamic cashoutResponse = await ApiHelperFunctions.cashoutTransaction(amount: amount, code: code, recipientName: recipientName, recipientNumber: recipientNumber, source: source, transactionType: transactionType, agentId: agentId, branchId: branchId);
@@ -22,16 +26,12 @@ class _CashoutInformationState extends State<CashoutInformation> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
 
     final agentActor = Provider.of<AgentActors>(context);
     final financeActor = Provider.of<FinanceActors>(context);
 
     String source = "app";
     String transactionType = "CASHOUT";
-
-    TextEditingController recipientNameController = TextEditingController();
-    TextEditingController recipientNumberController = TextEditingController();
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -55,7 +55,7 @@ class _CashoutInformationState extends State<CashoutInformation> {
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
           child: Form(
             key: _formKey,
-            child: Column(
+            child: ListView(
               children: <Widget>[
                 Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),

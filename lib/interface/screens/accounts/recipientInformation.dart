@@ -5,6 +5,7 @@ import 'package:payments/infrastructure/actors/finance_actors.dart';
 import 'package:provider/provider.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RecipientInformation extends StatefulWidget {
   const RecipientInformation({Key? key}) : super(key: key);
@@ -15,6 +16,12 @@ class RecipientInformation extends StatefulWidget {
 
 class _RecipientInformationState extends State<RecipientInformation> {
   String _recipient_name = "1";
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController recipientNameController = TextEditingController();
+  TextEditingController recipientNumberController = TextEditingController();
+  TextEditingController senderNameController = TextEditingController();
+  TextEditingController senderNumberController = TextEditingController();
 
   late int selectedRecipientIndex;  //where I want to store the selected index
   late String initialRecipientDropDownVal;
@@ -45,7 +52,6 @@ class _RecipientInformationState extends State<RecipientInformation> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
     String? _recipient_number, _address, _comment;
 
     final agentActor = Provider.of<AgentActors>(context);
@@ -54,10 +60,6 @@ class _RecipientInformationState extends State<RecipientInformation> {
     String source = "app";
     String transactionType = "TRANSFER";
 
-    TextEditingController recipientNameController = TextEditingController();
-    TextEditingController recipientNumberController = TextEditingController();
-    TextEditingController senderNameController = TextEditingController();
-    TextEditingController senderNumberController = TextEditingController();
 
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -81,8 +83,8 @@ class _RecipientInformationState extends State<RecipientInformation> {
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
+              // crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
@@ -294,23 +296,53 @@ class _RecipientInformationState extends State<RecipientInformation> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Processing Data')),
                           );
+                          try {
+                            var transferResponse = await transfer(
+                                senderNameController.text,
+                                senderNumberController.text,
+                                recipientNameController.text,
+                                recipientNumberController.text,
+                                source,
+                                transactionType,
+                                agentActor.agentModel_.agentId,
+                                agentActor.agentModel_.branchId,
+                                financeActor.transactionAmount);
 
-                          var transferResponse = await transfer(senderNameController.text, senderNumberController.text, recipientNameController.text, recipientNumberController.text, source, transactionType, agentActor.agentModel_.agentId, agentActor.agentModel_.branchId, financeActor.transactionAmount);
+                            debugPrint(
+                                "Transfer response is $transferResponse");
 
-                          debugPrint("Transfer response is $transferResponse");
+                            var getAgentDetailsIfExists = await ApiHelperFunctions
+                                .getAgentBalance(
+                                agentId: agentActor.agentModel_.agentId!);
 
-                          ApiHelperFunctions.getAgentBalance(agentId: agentActor.agentModel_.agentId!);
+                            agentActor.updateBalance(
+                                getAgentDetailsIfExists['Balance'].toString());
 
-                          dynamic getAgentTransactionsIfExists = await ApiHelperFunctions.getAgentTransactions(agentId: agentActor.agentModel_.agentId!);
+                            dynamic getAgentTransactionsIfExists = await ApiHelperFunctions
+                                .getAgentTransactions(
+                                agentId: agentActor.agentModel_.agentId!);
 
-                          for(var transaction in getAgentTransactionsIfExists){
-                            // debugPrint("Service category is $serviceCat");
-                            financeActor.addTransaction(TransactionModel.fromJson(transaction));
+                            for (var transaction in getAgentTransactionsIfExists) {
+                              // debugPrint("Service category is $serviceCat");
+                              financeActor.addTransaction(
+                                  TransactionModel.fromJson(transaction));
+                            }
+
+                            financeActor.updateTransaction(TransactionModel
+                                .fromJson(transferResponse));
+                            financeActor.updateRecentTransaction(
+                                transactionType);
+                          } catch(e){
+                            Fluttertoast.showToast(
+                                msg: "$e",
+                                toastLength: Toast.LENGTH_SHORT, //duration
+                                gravity: ToastGravity.BOTTOM, //location
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red, //background color
+                                textColor: Colors.white, //text Color
+                                fontSize: 16.0 //font size
+                            );
                           }
-
-                          financeActor.updateTransaction(TransactionModel.fromJson(transferResponse));
-                          financeActor.updateRecentTransaction(transactionType);
-
                           context.loaderOverlay.hide();
 
                           Navigator.pushReplacement(
