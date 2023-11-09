@@ -138,6 +138,8 @@ class _LoginState extends State<Login> {
                             debugPrint("$getAgentDetailsIfExists");
                             // debugPrint("${getAgentDetailsIfExists['AgentId']}");
 
+                            context.loaderOverlay.hide();
+
                             if (getAgentDetailsIfExists != null &&
                                 getAgentDetailsIfExists.runtimeType != String) {
                               agent_actor.updateAgent(AgentModel.fromJson(
@@ -146,7 +148,7 @@ class _LoginState extends State<Login> {
                               debugPrint("Agent name is ${agent_actor.agentModel_
                                   .username}");
 
-                              context.loaderOverlay.hide();
+                              // context.loaderOverlay.hide();
 
                               Navigator.pushReplacement(
                                 context,
@@ -154,7 +156,6 @@ class _LoginState extends State<Login> {
                                     builder: (context) => AccountsPage()),
                               );
                             } else {
-                              context.loaderOverlay.hide();
                               setState(() {
                                 showError = true;
                               });
